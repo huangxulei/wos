@@ -19,6 +19,8 @@ void main() async {
   runApp(const MyApp());
 }
 
+BoxDecoration globalDecoration;
+
 class MyApp extends StatefulWidget {
   const MyApp({Key key}) : super(key: key);
 
@@ -74,10 +76,7 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.black.withOpacity(0.8),
                 radius: 20.0,
                 textPadding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-                child: MaterialApp(
-                    navigatorKey: navigatorKey,
-                    title: Global.appName,
-                    home: HomePage()));
+                child: MaterialApp(navigatorKey: navigatorKey, title: Global.appName, home: HomePage()));
           case InitFlag.error:
             return MaterialApp(
               themeMode: _themeMode,

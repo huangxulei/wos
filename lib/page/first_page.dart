@@ -25,7 +25,7 @@ class FirstPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Color(0xFF18D191),
                 ),
-                child: new Icon(
+                child: Icon(
                   Icons.library_books,
                   color: Colors.white,
                   size: 32,
