@@ -1,0 +1,29 @@
+name: wos
+description: 我搜
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+    sdk: ">=2.7.0 <3.2.0"
+
+dependencies:
+    flutter:
+        sdk: flutter
+    cupertino_icons: ^1.0.2
+    flutter_displaymode: ^0.5.0
+    hive_flutter: ^1.1.0
+    oktoast: ^3.0.0
+    provider: ^5.0.0
+
+dev_dependencies:
+    flutter_test:
+        sdk: flutter
+    flutter_lints: ^2.0.0
+
+flutter:
+    uses-material-design: true
+    fonts:
+        - family: fonticons
+          fonts:
+              - asset: fonts/fonticons.ttf
