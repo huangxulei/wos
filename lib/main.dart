@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -12,8 +13,9 @@ import 'theme_box.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //在安装目录 windows下面 电脑 文档/eso
-  await Hive.initFlutter("eso");
+  await Hive.initFlutter("wos");
   await openThemeModeBox(); //初始化一个box
+
   runApp(const MyApp());
 }
 
@@ -42,8 +44,8 @@ class _MyAppState extends State<MyApp> {
         } else if (displayMode.refreshRate > 1) {
           await FlutterDisplayMode.setPreferredMode(displayMode);
         }
-        Future.delayed(Duration(seconds: 10), () {
-          print("延迟10钟后输出");
+        Future.delayed(Duration(seconds: 3), () {
+          print("延迟3钟后输出");
           initFlag = InitFlag.ok;
           setState(() {}); //刷新布局 initFlag 改变
         });
