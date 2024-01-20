@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -46,6 +45,7 @@ class _MyAppState extends State<MyApp> {
         } else if (displayMode.refreshRate > 1) {
           await FlutterDisplayMode.setPreferredMode(displayMode);
         }
+        await Global.init();
         Future.delayed(Duration(seconds: 3), () {
           print("延迟3钟后输出");
           initFlag = InitFlag.ok;
@@ -76,7 +76,12 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.black.withOpacity(0.8),
                 radius: 20.0,
                 textPadding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-                child: MaterialApp(navigatorKey: navigatorKey, title: Global.appName, home: HomePage()));
+                child: MaterialApp(
+                    navigatorKey: navigatorKey,
+                    title: Global.appName,
+                    theme: getGlobalThemeData(),
+                    darkTheme: getGlobalDarkThemeData(),
+                    home: HomePage()));
           case InitFlag.error:
             return MaterialApp(
               themeMode: _themeMode,

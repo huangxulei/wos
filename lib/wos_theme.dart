@@ -5,9 +5,11 @@ final _box = Hive.box(Global.profileKey);
 final globalConfigBox = _box;
 
 const versionBox = "versionBox";
+const fontFamilyBox = "fontFamilyBox";
 
 const thDef = {
   versionBox: '',
+  fontFamilyBox: '',
 };
 
 class WOSTheme {
@@ -27,6 +29,16 @@ class WOSTheme {
   void updateVersion() {
     version = lastestVersion;
   }
+
+  String get fontFamily =>
+      _box.get(fontFamilyBox, defaultValue: thDef[fontFamilyBox]);
+  set fontFamily(String value) {
+    if (value != fontFamily) {
+      _box.put(fontFamilyBox, cast(value, thDef[fontFamilyBox]));
+    }
+  }
+
+  static String staticFontFamily;
 }
 
 T cast<T>(x, T defaultValue) => x is T ? x : defaultValue; // 安全转换

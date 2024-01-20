@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:wos/page/favorite_list_page.dart';
+import 'package:wos/page/favorite_page.dart';
 import 'package:wos/page/page_switch.dart';
 import 'package:provider/provider.dart';
-import 'package:wos/setting/about_page.dart';
+import 'package:wos/page/setting/about_page.dart';
 import 'fonticons_icons.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,7 +32,8 @@ class _HomePageState extends State<HomePage> {
       }
       return ChangeNotifierProvider(
         create: (context) => PageSwitch(_nowIndex),
-        child: Consumer<PageSwitch>(builder: (BuildContext context, PageSwitch pageSwitch, Widget widget) {
+        child: Consumer<PageSwitch>(builder:
+            (BuildContext context, PageSwitch pageSwitch, Widget widget) {
           _nowIndex = pageSwitch.currentIndex;
           pageSwitch.updatePageController();
           final _pageView = PageView(
@@ -38,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             onPageChanged: (index) => pageSwitch.changePage(index, false),
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
-              Page(name: "收藏", mColor: Colors.red), //收藏
+              FavoritePage(),
               Page(name: "发现", mColor: Colors.blue),
               Page(name: "历史", mColor: Colors.green),
               AboutPage()
@@ -67,7 +70,15 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () => pageSwitch.changePage(0),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[Icon(FIcons.heart, color: getColor(pageSwitch, context, 0)), Text("收藏", style: TextStyle(color: getColor(pageSwitch, context, 0)))],
+                                      children: <Widget>[
+                                        Icon(FIcons.heart,
+                                            color: getColor(
+                                                pageSwitch, context, 0)),
+                                        Text("收藏",
+                                            style: TextStyle(
+                                                color: getColor(
+                                                    pageSwitch, context, 0)))
+                                      ],
                                     ),
                                   )),
                                   Expanded(
@@ -75,7 +86,15 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () => pageSwitch.changePage(1),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[Icon(FIcons.compass, color: getColor(pageSwitch, context, 1)), Text("发现", style: TextStyle(color: getColor(pageSwitch, context, 1)))],
+                                      children: <Widget>[
+                                        Icon(FIcons.compass,
+                                            color: getColor(
+                                                pageSwitch, context, 1)),
+                                        Text("发现",
+                                            style: TextStyle(
+                                                color: getColor(
+                                                    pageSwitch, context, 1)))
+                                      ],
                                     ),
                                   )),
                                 ],
@@ -91,7 +110,15 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () => pageSwitch.changePage(2),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[Icon(Icons.history, color: getColor(pageSwitch, context, 2)), Text("历史", style: TextStyle(color: getColor(pageSwitch, context, 2)))],
+                                      children: <Widget>[
+                                        Icon(Icons.history,
+                                            color: getColor(
+                                                pageSwitch, context, 2)),
+                                        Text("历史",
+                                            style: TextStyle(
+                                                color: getColor(
+                                                    pageSwitch, context, 2)))
+                                      ],
                                     ),
                                   )),
                                   Expanded(
@@ -100,8 +127,13 @@ class _HomePageState extends State<HomePage> {
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          Icon(Icons.info_outline_rounded, color: getColor(pageSwitch, context, 3)),
-                                          Text("关于", style: TextStyle(color: getColor(pageSwitch, context, 3)))
+                                          Icon(Icons.info_outline_rounded,
+                                              color: getColor(
+                                                  pageSwitch, context, 3)),
+                                          Text("关于",
+                                              style: TextStyle(
+                                                  color: getColor(
+                                                      pageSwitch, context, 3)))
                                         ],
                                       ),
                                     ),
@@ -137,5 +169,7 @@ class Page extends StatelessWidget {
 }
 
 Color getColor(PageSwitch pageSwitch, BuildContext context, int value) {
-  return pageSwitch.currentIndex == value ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyText1.color;
+  return pageSwitch.currentIndex == value
+      ? Theme.of(context).primaryColor
+      : Theme.of(context).textTheme.bodyText1.color;
 }

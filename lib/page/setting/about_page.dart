@@ -2,8 +2,9 @@ import 'package:about/about.dart';
 import 'package:flutter/material.dart';
 import 'package:wos/main.dart';
 
-import '../global.dart';
-import '../wos_theme.dart';
+import '../../global.dart';
+import '../../wos_theme.dart';
+import 'display_high_rate.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({Key key}) : super(key: key);
@@ -27,7 +28,25 @@ class _AboutPageState extends State<AboutPage> {
 
       return Row(
         children: <Widget>[
-          Expanded(child: AboutPage2()),
+          Expanded(child: AboutPage2(invokeTap: (Widget detailPage) {
+            if (isLargeScreen) {
+              this.detailPage = detailPage;
+              setState(() {});
+            } else {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => detailPage));
+            }
+          })),
+          SizedBox(
+            height: double.infinity,
+            width: 2,
+            child: Material(
+              color: Colors.grey.withAlpha(123),
+            ),
+          ),
+          isLargeScreen
+              ? Expanded(child: detailPage ?? Scaffold())
+              : Container(),
         ],
       );
     });
@@ -48,22 +67,26 @@ class AboutPage2 extends StatelessWidget {
           title: Text(Global.appName),
         ),
         body: () {
+          final profile = WOSTheme();
           return ListView(
             children: <Widget>[
               Card(
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                      title: Text('设置', style: TextStyle(color: Theme.of(context).primaryColor)),
+                      title: Text('设置',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor)),
                     ),
                     Divider(),
                     ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 16),
                       title: Text("刷新率设置"),
                       subtitle: Text(
                         "一加的部分机型可能需要",
                       ),
-                      onTap: () {},
+                      onTap: () => invokeTap(DisplayHighRate()),
                     ),
                   ],
                 ),
@@ -71,7 +94,8 @@ class AboutPage2 extends StatelessWidget {
               Card(
                   child: Material(
                       color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0)),
                       child: InkWell(
                         //水波纹效果
                         onTap: () => showAbout(context),
@@ -101,7 +125,10 @@ class AboutPage2 extends StatelessWidget {
                             ),
                           ),
                         ),
-                      )))
+                      ))),
+              SizedBox(
+                height: 4,
+              )
             ],
           );
         }(),
@@ -109,9 +136,11 @@ class AboutPage2 extends StatelessWidget {
     );
   }
 
-  static void showAbout(BuildContext context, [bool showClose = false]) => showAboutDialog(
+  static void showAbout(BuildContext context, [bool showClose = false]) =>
+      showAboutDialog(
           context: context,
-          applicationLegalese: '版本 ${Global.appVersion}\n版号 ${Global.appBuildNumber}\n包名 ${Global.appPackageName}',
+          applicationLegalese:
+              '版本 ${Global.appVersion}\n版号 ${Global.appBuildNumber}\n包名 ${Global.appPackageName}',
           applicationIcon: Image.asset(
             Global.logoPath,
             width: 50,
