@@ -4,6 +4,7 @@ import 'package:wos/main.dart';
 
 import '../../global.dart';
 import '../../wos_theme.dart';
+import '../add_local_item_page.dart';
 import 'display_high_rate.dart';
 
 class AboutPage extends StatefulWidget {
@@ -87,6 +88,15 @@ class AboutPage2 extends StatelessWidget {
                         "一加的部分机型可能需要",
                       ),
                       onTap: () => invokeTap(DisplayHighRate()),
+                    ),
+                    ListTile(
+                      title: Text('本地导入'),
+                      subtitle: Text('导入txt或者epub'),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddLocalItemPage(),
+                          )),
                     ),
                   ],
                 ),
