@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -22,6 +23,13 @@ class Utils {
   /// 检测路径是否存在
   static bool existPath(final String _path) {
     return Directory(_path).existsSync();
+  }
+
+  /// 清除输入焦点
+  static unFocus(BuildContext context) {
+    var f = FocusScope.of(context);
+    if (f != null && f.hasFocus)
+      f.unfocus(disposition: UnfocusDisposition.scope);
   }
 
   static toast(msg,

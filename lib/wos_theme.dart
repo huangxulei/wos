@@ -7,6 +7,7 @@ final globalConfigBox = _box;
 const versionBox = "versionBox";
 const fontFamilyBox = "fontFamilyBox";
 const searchPostionBox = "searchPostionBox";
+const switchLongPressBox = "switchLongPressBox";
 
 const thDef = {
   versionBox: '',
@@ -35,7 +36,8 @@ class WOSTheme {
     version = lastestVersion;
   }
 
-  String get fontFamily => _box.get(fontFamilyBox, defaultValue: thDef[fontFamilyBox]);
+  String get fontFamily =>
+      _box.get(fontFamilyBox, defaultValue: thDef[fontFamilyBox]);
   set fontFamily(String value) {
     if (value != fontFamily) {
       _box.put(fontFamilyBox, cast(value, thDef[fontFamilyBox]));
@@ -44,10 +46,19 @@ class WOSTheme {
 
   static String staticFontFamily;
 
-  int get searchPostion => _box.get(searchPostionBox, defaultValue: thDef[searchPostionBox]);
+  int get searchPostion =>
+      _box.get(searchPostionBox, defaultValue: thDef[searchPostionBox]);
   set searchPostion(int value) {
     if (value != searchPostion) {
       _box.put(searchPostionBox, cast(value, thDef[searchPostionBox]));
+    }
+  }
+
+  bool get switchLongPress =>
+      _box.get(switchLongPressBox, defaultValue: thDef[switchLongPressBox]);
+  set switchLongPress(bool value) {
+    if (value != switchLongPress) {
+      _box.put(switchLongPressBox, cast(value, thDef[switchLongPressBox]));
     }
   }
 }

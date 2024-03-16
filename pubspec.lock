@@ -134,14 +134,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.5.0"
-  flutter_lints:
-    dependency: "direct dev"
-    description:
-      name: flutter_lints
-      sha256: a25a15ebbdfc33ab1cd26c63a6ee519df92338a9c10f122adda92938253bef04
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.3"
   flutter_markdown:
     dependency: transitive
     description:
@@ -200,14 +192,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.5"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: "5e4a9cd06d447758280a8ac2405101e0e2094d2a1dbdd3756aec3fe7775ba593"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.1"
   logging:
     dependency: transitive
     description:
@@ -320,6 +304,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.7"
+  permission_handler:
+    dependency: "direct main"
+    description:
+      name: permission_handler
+      sha256: e968207ce71d8b40d719aeca3e5a8b684494ecbe9a577dd67cc701216bcccf0a
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "7.2.0"
+  permission_handler_platform_interface:
+    dependency: transitive
+    description:
+      name: permission_handler_platform_interface
+      sha256: "6760eb5ef34589224771010805bea6054ad28453906936f843a8cc4d3a55c4a4"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.12.0"
   petitparser:
     dependency: transitive
     description:

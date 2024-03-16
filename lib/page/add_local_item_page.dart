@@ -1,12 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:wos/main.dart';
 import 'package:wos/utils/auto_decode_cli.dart';
-
+import 'package:image/image.dart' as image;
+import 'package:path/path.dart' as path;
+import '../api/api.dart';
 import '../database/chapter_item.dart';
+import '../database/search_item.dart';
+import '../database/search_item_manager.dart';
+import '../utils/cache_util.dart';
 import '../utils/utils.dart';
 
 class AddLocalItemPage extends StatefulWidget {
@@ -21,6 +25,7 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
   PlatformFile platformFile;
   String content;
   EpubBook epubBook;
+  SearchItem searchItem;
   TextEditingController textEditingController;
   TextEditingController textEditingControllerReg;
   final List<String> contents = <String>[];
@@ -46,6 +51,18 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
         epubBook = await EpubReader.readBook(
             File(platformFile.path).readAsBytesSync());
         textEditingController.text = epubBook.Title;
+        searchItem = SearchItem(
+          cover: base64Encode(image.encodePng(epubBook.CoverImage)),
+          name: epubBook.Title,
+          author: epubBook.Author,
+          chapter:
+              epubBook.Chapters.isNotEmpty ? epubBook.Chapters.last.Title : "",
+          description: "",
+          url: platformFile.path,
+          api: BaseAPI(
+              origin: "本地", originTag: "本地", ruleContentType: API.NOVEL),
+          tags: [],
+        );
       } catch (e) {
         Utils.toast("$e");
       }
@@ -67,8 +84,6 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
       }
     }
   }
-
-  void parseEpub() {}
 
   //解析txt文件
   void parseText() {
@@ -96,6 +111,27 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
     }
   }
 
+  void parseEpubChapter(List<ChapterItem> c, List<EpubChapter> chapters) {
+    for (var chapter in chapters) {
+      //获取每章的内容
+      var temp = chapter.HtmlContent;
+      contents.add(temp.trimLeft());
+      c.add(ChapterItem(name: chapter.Title, url: "${contents.length}.txt"));
+      if (chapter.SubChapters.isNotEmpty) {
+        parseEpubChapter(c, chapter.SubChapters);
+      }
+    }
+  }
+
+  void parseEpub() {
+    // searchItem.chapters?.clear();
+    contents.clear();
+    searchItem.chapters = <ChapterItem>[];
+    parseEpubChapter(searchItem.chapters, epubBook.Chapters);
+    searchItem.chaptersCount = searchItem.chapters.length;
+    setState(() {});
+  }
+
   @override
   void initState() {
     platformFile = widget.platformFile;
@@ -116,23 +152,81 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: globalDecoration,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("导入本地txt或epub"),
-        ),
-        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: InkWell(
-              child: Text(
-                "点击选择 ${platformFile?.extension} ${(platformFile?.size ?? 0) ~/ 1024}KB ${platformFile?.path}",
-              ),
-              onTap: init,
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text("导入本地txt或epub"),
             ),
-          ),
-        ]),
-      ),
-    );
+            body:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  child: Text(
+                    "点击选择 ${platformFile?.extension} ${(platformFile?.size ?? 0) ~/ 1024}KB ${platformFile?.path}",
+                  ),
+                  onTap: init,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Text("书名："),
+                    Expanded(
+                      child: TextField(
+                        controller: textEditingController,
+                        onChanged: (value) {
+                          searchItem.name = value;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Wrap(spacing: 10, alignment: WrapAlignment.start, children: [
+                TextButton(
+                  onPressed: () async {
+                    // 写入文件
+                    final cache = CacheUtil(
+                        basePath:
+                            "cache${Platform.pathSeparator}${searchItem.id}");
+                    final dir = await cache.cacheDir();
+                    final d = Directory(dir);
+                    if (!d.existsSync()) {
+                      d.createSync(recursive: true);
+                    }
+                    print("写入文件中 $dir");
+                    final reg = RegExp(r"^\s*|(\s{2,}|\n)\s*");
+                    for (var i = 0; i < contents.length; i++) {
+                      File(path.join(dir, '$i.txt')).writeAsStringSync(
+                          contents[i]
+                              .split(reg)
+                              .map((s) => s.trimLeft())
+                              .join("\n"));
+                    }
+                    //写入div中
+                    SearchItemManager.addSearchItem(searchItem);
+                    print("成功");
+                  },
+                  child: Text("导入"),
+                ),
+              ]),
+              Expanded(
+                child: Card(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(8.0),
+                    itemExtent: 26,
+                    itemCount: searchItem?.chapters?.length ?? 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      return SizedBox(
+                        height: 26,
+                        child: Text(
+                            "${(index + 1).toString().padLeft(4)}   ${searchItem.chapters[index].name}"),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ])));
   }
 }
