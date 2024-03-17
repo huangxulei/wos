@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:wos/utils/auto_decode_cli.dart';
 import 'package:image/image.dart' as image;
+import 'package:flutter/src/widgets/image.dart' as img;
 import 'package:path/path.dart' as path;
 import '../api/api.dart';
 import '../database/chapter_item.dart';
@@ -51,8 +52,11 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
         epubBook = await EpubReader.readBook(
             File(platformFile.path).readAsBytesSync());
         textEditingController.text = epubBook.Title;
+        // Image.memory(base64Decode(searchItem?.cover), width: 180,),
         searchItem = SearchItem(
-          cover: base64Encode(image.encodePng(epubBook.CoverImage)),
+          cover: epubBook.CoverImage != null
+              ? base64Encode(image.encodePng(epubBook.CoverImage))
+              : "nocover",
           name: epubBook.Title,
           author: epubBook.Author,
           chapter:
@@ -211,6 +215,56 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
                   child: Text("导入"),
                 ),
               ]),
+              Expanded(
+                  child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    child: searchItem?.cover == "nocover"
+                        ? img.Image.asset(
+                            'lib/assets/no_image.png',
+                            width: 180,
+                          )
+                        : img.Image.memory(
+                            base64Decode(searchItem?.cover),
+                            width: 180,
+                          ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            searchItem.name,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Colors.black54,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(searchItem.author)
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              )),
               Expanded(
                 child: Card(
                   child: ListView.builder(
