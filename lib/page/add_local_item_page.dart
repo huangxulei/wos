@@ -12,7 +12,7 @@ import '../database/chapter_item.dart';
 import '../database/search_item.dart';
 import '../database/search_item_manager.dart';
 import '../utils/cache_util.dart';
-import '../utils/utils.dart';
+import '../utils.dart';
 
 class AddLocalItemPage extends StatefulWidget {
   final PlatformFile platformFile;
@@ -27,11 +27,20 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
   String content;
   EpubBook epubBook;
   SearchItem searchItem;
-  TextEditingController textEditingController;
-  TextEditingController textEditingControllerReg;
   final List<String> contents = <String>[];
-  final defaultReg =
-      "(\\s|\\n|^)(第)([\\u4e00-\\u9fa5a-zA-Z0-9]{1,7})[章|节|回|卷][^\\n]{1,35}(\\n|\$)";
+
+  @override
+  void initState() {
+    platformFile = widget.platformFile;
+    init();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    contents.clear();
+    super.dispose();
+  }
 
   init() async {
     if (platformFile == null) {
@@ -51,8 +60,6 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
       try {
         epubBook = await EpubReader.readBook(
             File(platformFile.path).readAsBytesSync());
-        textEditingController.text = epubBook.Title;
-        // Image.memory(base64Decode(searchItem?.cover), width: 180,),
         searchItem = SearchItem(
           cover: epubBook.CoverImage != null
               ? base64Encode(image.encodePng(epubBook.CoverImage))
@@ -79,39 +86,9 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
 
       try {
         content = autoReadFile(platformFile.path);
-        textEditingController.text = Utils.getFileName(platformFile.name);
-        if (textEditingControllerReg.text.isEmpty) {
-          textEditingControllerReg.text = defaultReg;
-        }
       } catch (e) {
         Utils.toast("$e");
       }
-    }
-  }
-
-  //解析txt文件
-  void parseText() {
-    contents.clear();
-    final chapters = <ChapterItem>[]; //章节
-    var start = 0;
-    var name = "";
-    var i = 0;
-    //正则txt文件
-    for (var r in RegExp(textEditingControllerReg.text).allMatches(content)) {
-      if (start == 0 && r.start > 0) {
-        chapters.add(ChapterItem(name: "无名", url: "${i++}.txt"));
-      }
-      final tempName = content.substring(r.start, r.end).trim();
-      if (tempName == name) continue;
-      var temp = content.substring(start, r.start).trim();
-      if (temp.startsWith(name)) {
-        contents.add(temp.substring(name.length));
-      } else {
-        contents.add(temp);
-      }
-      start = r.end;
-      name = tempName;
-      chapters.add(ChapterItem(name: name, url: "${i++}.txt"));
     }
   }
 
@@ -128,29 +105,12 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
   }
 
   void parseEpub() {
-    // searchItem.chapters?.clear();
+    searchItem.chapters?.clear();
     contents.clear();
     searchItem.chapters = <ChapterItem>[];
     parseEpubChapter(searchItem.chapters, epubBook.Chapters);
     searchItem.chaptersCount = searchItem.chapters.length;
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    platformFile = widget.platformFile;
-    textEditingController = TextEditingController();
-    textEditingControllerReg = TextEditingController();
-    init();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    textEditingController?.dispose();
-    textEditingControllerReg?.dispose();
-    contents.clear();
-    super.dispose();
   }
 
   @override
@@ -169,22 +129,6 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
                     "点击选择 ${platformFile?.extension} ${(platformFile?.size ?? 0) ~/ 1024}KB ${platformFile?.path}",
                   ),
                   onTap: init,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text("书名："),
-                    Expanded(
-                      child: TextField(
-                        controller: textEditingController,
-                        onChanged: (value) {
-                          searchItem.name = value;
-                        },
-                      ),
-                    ),
-                  ],
                 ),
               ),
               Wrap(spacing: 10, alignment: WrapAlignment.start, children: [
@@ -215,56 +159,7 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
                   child: Text("导入"),
                 ),
               ]),
-              Expanded(
-                  child: Row(
-                children: [
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(10.0),
-                    child: searchItem?.cover == "nocover"
-                        ? img.Image.asset(
-                            'lib/assets/no_image.png',
-                            width: 180,
-                          )
-                        : img.Image.memory(
-                            base64Decode(searchItem?.cover),
-                            width: 180,
-                          ),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            searchItem.name,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.person,
-                            color: Colors.black54,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(searchItem.author)
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              )),
+              if (searchItem != null) _builder(searchItem),
               Expanded(
                 child: Card(
                   child: ListView.builder(
@@ -283,4 +178,56 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
               ),
             ])));
   }
+}
+
+Widget _builder(SearchItem searchItem) {
+  return Expanded(
+      child: Row(
+    children: [
+      SizedBox(
+        width: 20,
+      ),
+      Container(
+        margin: EdgeInsets.all(10.0),
+        child: searchItem?.cover == "nocover"
+            ? img.Image.asset(
+                'lib/assets/no_image.png',
+                width: 180,
+              )
+            : img.Image.memory(
+                base64Decode(searchItem?.cover),
+                width: 180,
+              ),
+      ),
+      SizedBox(
+        width: 20,
+      ),
+      Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                searchItem?.name,
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.person,
+                color: Colors.black54,
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text(searchItem?.author)
+            ],
+          )
+        ],
+      )
+    ],
+  ));
 }

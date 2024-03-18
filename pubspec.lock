@@ -248,6 +248,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.4.0"
+  outline_material_icons:
+    dependency: "direct main"
+    description:
+      name: outline_material_icons
+      sha256: "7d9269fb16ee098116bf2498e96f1fc9750d880e8a4a2bedc5ebb064f438701b"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.1"
   path:
     dependency: transitive
     description:

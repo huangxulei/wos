@@ -21,6 +21,7 @@ class Global with ChangeNotifier {
   static const searchItemKey = "searchItem";
   static bool _isDesktop;
   static bool get isDesktop => _isDesktop;
+  static Color primaryColor;
 
   static Future<bool> init() async {
     Hive.registerAdapter(SearchItemAdapter());

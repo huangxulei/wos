@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wos/page/fonticons_icons.dart';
-import 'package:wos/utils/utils.dart';
+import 'package:wos/utils.dart';
 import 'package:wos/wos_theme.dart';
 
 class EmptyListMsgView extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wos/database/chapter_item.dart';
-import 'package:wos/utils/utils.dart';
+import 'package:wos/utils.dart';
 
 import '../global.dart';
 import 'search_item.dart';

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:wos/global.dart';
 import 'package:wos/main.dart';
+import 'package:wos/menu/menu_favorite.dart';
 import 'package:wos/ui/round_indicator.dart';
 import 'package:wos/wos_theme.dart';
 
 import '../api/api.dart';
+import '../menu/menu.dart';
+import '../utils.dart';
+import 'add_local_item_page.dart';
 import 'setting/about_page.dart';
 import 'favorite_list_page.dart';
 
@@ -110,6 +114,25 @@ class FavoritePage2 extends StatelessWidget {
                         ))
                     .toList(),
               ),
+              actions: <Widget>[
+                Menu<MenuFavorite>(
+                    tooltip: "选项",
+                    items: favoriteMenus,
+                    onSelect: (value) {
+                      switch (value) {
+                        case MenuFavorite.addItem:
+                          Utils.startPageWait(context, AddLocalItemPage());
+                          break;
+                        case MenuFavorite.history:
+                          // Utils.startPageWait(context, HistoryPage());
+                          break;
+                        case MenuFavorite.more_settings:
+                          Utils.startPageWait(context, AboutPage());
+                          break;
+                        default:
+                      }
+                    }),
+              ],
             ),
             body: TabBarView(
               children: tabs
