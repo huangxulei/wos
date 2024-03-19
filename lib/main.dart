@@ -46,8 +46,8 @@ class _MyAppState extends State<MyApp> {
           await FlutterDisplayMode.setPreferredMode(displayMode);
         }
         await Global.init();
-        Future.delayed(Duration(seconds: 3), () {
-          print("延迟3钟后输出");
+        Future.delayed(Duration(seconds: 1), () {
+          print("延迟1钟后输出");
           initFlag = InitFlag.ok;
           setState(() {}); //刷新布局 initFlag 改变
         });

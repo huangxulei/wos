@@ -11,6 +11,7 @@ import '../api/api.dart';
 import '../database/chapter_item.dart';
 import '../database/search_item.dart';
 import '../database/search_item_manager.dart';
+import '../ui/widget/image_place_holder.dart';
 import '../utils/cache_util.dart';
 import '../utils.dart';
 
@@ -189,13 +190,10 @@ Widget _builder(SearchItem searchItem) {
       ),
       Container(
         margin: EdgeInsets.all(10.0),
-        child: searchItem?.cover == "nocover"
-            ? img.Image.asset(
-                'lib/assets/no_image.png',
-                width: 180,
-              )
+        child: searchItem.cover == "nocover"
+            ? ImagePlaceHolder(height: 300, width: 180)
             : img.Image.memory(
-                base64Decode(searchItem?.cover),
+                base64Decode(searchItem.cover),
                 width: 180,
               ),
       ),

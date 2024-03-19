@@ -54,4 +54,8 @@ class Utils {
     if (replace == true) return await Navigator.pushReplacement(context, rote);
     return await Navigator.push(context, rote);
   }
+
+  static bool empty(String value) {
+    return value == null || value.isEmpty;
+  }
 }

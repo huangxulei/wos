@@ -35,6 +35,10 @@ class FavoriteListProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void adjustScroll() {
+    notifyListeners();
+  }
+
   void updateList([String tag]) {
     _searchList = SearchItemManager.getSearchItemByType(
         type, _sortType, tag ?? selectTag);

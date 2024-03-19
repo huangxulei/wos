@@ -23,6 +23,15 @@ class Global with ChangeNotifier {
   static bool get isDesktop => _isDesktop;
   static Color primaryColor;
 
+  /// 默认材质高度
+  static double elevation = 0.5;
+
+  /// 默认分隔线高度
+  static double lineSize = 0.35;
+
+  /// 默认按钮边框大小
+  static double borderSize = 0.5;
+
   static Future<bool> init() async {
     Hive.registerAdapter(SearchItemAdapter());
     await Hive.openBox(Global.profileKey);
