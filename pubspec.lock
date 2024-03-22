@@ -445,6 +445,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.16"
+  text_composition:
+    dependency: "direct main"
+    description:
+      path: "modules/text_composition"
+      relative: true
+    source: path
+    version: "0.0.5"
   typed_data:
     dependency: transitive
     description:

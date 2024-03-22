@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../api/api.dart';
 import '../database/search_item.dart';
+import '../model/chapter_page_provider.dart';
 import 'chapter_item_adapter.dart';
 
 T cast<T>(x, T v) => x is T ? x : v;
@@ -22,7 +23,12 @@ class SearchItemAdapter extends TypeAdapter<SearchItem> {
         description = cast(reader.readString(), ""),
         url = cast(reader.readString(), ""),
         ruleContentType = cast(reader.readInt(), API.MANGA),
+        chapterListStyle = cast(reader.readInt(), ChapterPageProvider.BigList),
+        durChapter = cast(reader.readString(), ""),
+        durChapterIndex = cast(reader.readInt(), 0),
+        durContentIndex = cast(reader.readInt(), 0),
         chaptersCount = cast(reader.readInt(), 0),
+        reverseChapter = cast(reader.readBool(), false),
         tags = cast(reader.readStringList(), <String>[]),
         createTime = cast(reader.readInt(), now.microsecondsSinceEpoch),
         updateTime = cast(reader.readInt(), now.microsecondsSinceEpoch),
@@ -44,7 +50,12 @@ class SearchItemAdapter extends TypeAdapter<SearchItem> {
       description,
       url,
       ruleContentType,
+      chapterListStyle,
+      durChapter,
+      durChapterIndex,
+      durContentIndex,
       chaptersCount,
+      reverseChapter,
       tags,
       //增加时间
       createTime,
@@ -72,7 +83,12 @@ class SearchItemAdapter extends TypeAdapter<SearchItem> {
     writer.writeString(cast(item.description, ""));
     writer.writeString(cast(item.url, ""));
     writer.writeInt(cast(item.ruleContentType, API.MANGA));
+    writer.writeInt(cast(item.chapterListStyle, ChapterPageProvider.BigList));
+    writer.writeString(cast(item.durChapter, ""));
+    writer.writeInt(cast(item.durChapterIndex, 0));
+    writer.writeInt(cast(item.durContentIndex, 0));
     writer.writeInt(cast(item.chaptersCount, 0));
+    writer.writeBool(cast(item.reverseChapter, false));
     writer.writeStringList(cast(item.tags, <String>[]));
     writer.writeInt(cast(item.createTime, now.microsecondsSinceEpoch));
     writer.writeInt(cast(item.updateTime, now.microsecondsSinceEpoch));

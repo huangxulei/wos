@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wos/utils.dart';
 import 'package:wos/wos_theme.dart';
-
 import '../database/search_item.dart';
+import '../model/chapter_page_provider.dart';
 import '../ui/widget/draggable_scrollbar_sliver.dart';
 import '../ui/widget/image_place_holder.dart';
 import 'content_page_manager.dart';
@@ -38,35 +38,38 @@ class _ChapterPageState extends State<ChapterPage> {
     final size = MediaQuery.of(context).size;
     final topHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
     _controller = ScrollController();
-    return Container(
-        child: Scaffold(
-            body: Stack(
-      children: [
-        NotificationListener(
-          child: DraggableScrollbar.semicircle(
-            child: CustomScrollView(
-              physics: ClampingScrollPhysics(),
-              controller: _controller,
-              slivers: <Widget>[
-                _comicDetail(context),
-                _buildChapter(context),
+    return ChangeNotifierProvider<ChapterPageProvider>(
+        create: (context) =>
+            ChapterPageProvider(searchItem: searchItem, size: size),
+        builder: (context, child) => Container(
+                child: Scaffold(
+                    body: Stack(
+              children: [
+                NotificationListener(
+                  child: DraggableScrollbar.semicircle(
+                    child: CustomScrollView(
+                      physics: ClampingScrollPhysics(),
+                      controller: _controller,
+                      slivers: <Widget>[
+                        _comicDetail(context),
+                        _buildChapter(context),
+                      ],
+                    ),
+                    controller: _controller,
+                    padding: const EdgeInsets.only(top: 100, bottom: 8),
+                  ),
+                  onNotification: ((ScrollUpdateNotification n) {
+                    if (n.depth == 0 && n.metrics.pixels <= 200.0) {
+                      opacity = min(n.metrics.pixels, 100.0) / 100.0;
+                      if (opacity < 0) opacity = 0;
+                      if (opacity > 1) opacity = 1;
+                      if (state != null) state(() => null);
+                    }
+                    return true;
+                  }),
+                )
               ],
-            ),
-            controller: _controller,
-            padding: const EdgeInsets.only(top: 100, bottom: 8),
-          ),
-          onNotification: ((ScrollUpdateNotification n) {
-            if (n.depth == 0 && n.metrics.pixels <= 200.0) {
-              opacity = min(n.metrics.pixels, 100.0) / 100.0;
-              if (opacity < 0) opacity = 0;
-              if (opacity > 1) opacity = 1;
-              if (state != null) state(() => null);
-            }
-            return true;
-          }),
-        )
-      ],
-    )));
+            ))));
   }
 
   static double lastTopHeight = 0.0;
@@ -134,21 +137,24 @@ class _ChapterPageState extends State<ChapterPage> {
   }
 
   Widget _buildChapter(BuildContext context) {
-    void Function(int index) onTap = (int index) {
-      Navigator.of(context).push(ContentPageRoute().route(searchItem));
-    };
-    return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            return buildChapterButton(index, onTap);
-          },
-          childCount: searchItem.chapters.length,
-        ),
-      ),
-    );
-    ;
+    return Consumer<ChapterPageProvider>(builder: (context, provider, child) {
+      void Function(int index) onTap = (int index) {
+        provider.changeChapter(index);
+        Navigator.of(context).push(ContentPageRoute().route(searchItem));
+      };
+      return StatefulBuilder(
+          builder: (BuildContext context, setState) => SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return buildChapterButton(index, onTap);
+                    },
+                    childCount: searchItem.chapters.length,
+                  ),
+                ),
+              ));
+    });
   }
 
   Widget buildChapterButton(int chapterIndex, void Function(int) onTap) {

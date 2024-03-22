@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:wos/database/search_item_manager.dart';
+import '../api/api.dart';
 import '../database/search_item.dart';
 import '../ui/widget/image_place_holder.dart';
 import '../wos_theme.dart';
@@ -42,6 +43,14 @@ class FavoriteListPage extends StatelessWidget {
   }
 
   Widget _ui_favorite_item(SearchItem searchItem) {
+    final count = searchItem.chaptersCount.toString();
+    final currentCount = searchItem.durChapterIndex + 1;
+    final suffix = {
+      API.NOVEL: "章",
+      API.MANGA: "话",
+      API.AUDIO: "首",
+      API.VIDEO: "集",
+    };
     return Flex(direction: Axis.vertical, children: <Widget>[
       Expanded(
         child: Container(
@@ -67,7 +76,7 @@ class FavoriteListPage extends StatelessWidget {
       Container(
           alignment: Alignment.center,
           child: Text(
-            searchItem.author,
+            '${"0" * (count.length - currentCount.toString().length)}$currentCount${suffix[searchItem.ruleContentType]}/$count${suffix[searchItem.ruleContentType]}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           )),

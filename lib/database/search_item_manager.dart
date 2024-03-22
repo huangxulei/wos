@@ -58,6 +58,30 @@ class SearchItemManager {
     return searchItem;
   }
 
+  static bool isFavorite(String originTag, String url) {
+    return _searchItem
+        .any((item) => item.originTag == originTag && item.url == url);
+  }
+
+  static Future<bool> toggleFavorite(SearchItem searchItem) {
+    if (isFavorite(searchItem.originTag, searchItem.url)) {
+      return removeSearchItem(searchItem.id);
+    } else {
+      //添加时间信息
+      searchItem.createTime = DateTime.now().microsecondsSinceEpoch;
+      searchItem.updateTime = DateTime.now().microsecondsSinceEpoch;
+      searchItem.lastReadTime = DateTime.now().microsecondsSinceEpoch;
+      return addSearchItem(searchItem);
+    }
+  }
+
+  static Future<bool> removeSearchItem(int id) async {
+    final sbox = Hive.box<SearchItem>(key);
+    sbox.delete(id.toString());
+    _searchItem = sbox.values.toList();
+    return true;
+  }
+
   // static Future<void> refreshAll() async {
   //   // 先用单并发，加延时5s判定
   //   for (var item in _searchItem) {

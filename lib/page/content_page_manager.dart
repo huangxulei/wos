@@ -2,15 +2,30 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:wos/api/api.dart';
 
 import '../database/search_item.dart';
 import '../utils/cache_util.dart';
 import '../utils/memory_cache.dart';
+import 'novel_page_refactor.dart';
 
 class ContentPageRoute {
   MaterialPageRoute route(SearchItem searchItem) {
     searchItem.lastReadTime = DateTime.now().microsecondsSinceEpoch;
-    return MaterialPageRoute(builder: (context) {});
+    return MaterialPageRoute(builder: (context) {
+      return ChangeNotifierProvider<ContentProvider>(
+          create: (context) => ContentProvider(searchItem), //数据加载
+          builder: (context, child) {
+            final provider = Provider.of<ContentProvider>(context);
+            switch (searchItem.ruleContentType) {
+              case API.NOVEL:
+                return NovelPage(searchItem: searchItem);
+              default:
+                throw ('${searchItem.ruleContentType} not support !');
+            }
+          });
+    });
   }
 }
 
@@ -53,5 +68,25 @@ class ContentProvider with ChangeNotifier {
   _addInfo(String s) {
     _info += "\n[${_format.format(DateTime.now())}] $s";
     notifyListeners();
+  }
+
+  Future<List<String>> loadChapter(int chapterIndex) {
+    final r = _memoryCache.getValueOrSet(chapterIndex, () async {
+      final resp = await _cache.getData('$chapterIndex.txt',
+          hashCodeKey: false, shouldDecode: false);
+      if (resp != null && resp is String && resp.isNotEmpty) {
+        return resp.split("\n");
+      } else {
+        return <String>[];
+      }
+    });
+
+    return r;
+  }
+
+  Future<void> retryUseCache() async {
+    _cache =
+        CacheUtil(basePath: "cache${Platform.pathSeparator}${searchItem.id}");
+    _canUseCache = await CacheUtil.requestPermission();
   }
 }
