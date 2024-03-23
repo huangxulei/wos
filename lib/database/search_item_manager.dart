@@ -10,11 +10,12 @@ class SearchItemManager {
   static String get key => Global.searchItemKey;
 
   static get searchItem => _searchItem;
+  static Box<SearchItem> sbox = Hive.box<SearchItem>(key);
+
   //初始化内容
   static void initSearchItem() {
     // _searchItem = <SearchItem>[];
     //保存在searchItem.hive中
-    final sbox = Hive.box<SearchItem>(key);
     _searchItem = sbox.values.toList();
     for (SearchItem _item in _searchItem) {
       print(_item.name);

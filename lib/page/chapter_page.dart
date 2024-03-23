@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:wos/utils.dart';
 import 'package:wos/wos_theme.dart';
 import '../database/search_item.dart';
+import '../database/search_item_manager.dart';
+import '../menu/menu.dart';
+import '../menu/menu_chapter.dart';
 import '../model/chapter_page_provider.dart';
 import '../ui/widget/draggable_scrollbar_sliver.dart';
 import '../ui/widget/image_place_holder.dart';
@@ -67,9 +70,51 @@ class _ChapterPageState extends State<ChapterPage> {
                     }
                     return true;
                   }),
-                )
+                ),
+                StatefulBuilder(
+                  builder: (context, _state) {
+                    state = _state;
+                    return Container(
+                      child: _buildAlphaAppbar(context),
+                      height: topHeight,
+                    );
+                  },
+                ),
               ],
             ))));
+  }
+
+  //头部
+  Widget _buildAlphaAppbar(BuildContext context) {
+    final provider = Provider.of<ChapterPageProvider>(context, listen: false);
+
+    return AppBar(
+      elevation: 0.0,
+      backgroundColor:
+          Theme.of(context).appBarTheme.backgroundColor.withOpacity(opacity),
+      title: Text(
+        searchItem.origin,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      actions: <Widget>[
+        // 加入收藏时需要刷新图标，其他不刷新
+        Consumer<ChapterPageProvider>(
+          builder: (context, provider, child) => IconButton(
+            icon: SearchItemManager.isFavorite(
+                    searchItem.originTag, searchItem.url)
+                ? Icon(Icons.favorite)
+                : Icon(Icons.favorite_border),
+            iconSize: 21,
+            onPressed: provider.toggleFavorite,
+          ),
+        ),
+        Menu<MenuChapter>(
+          items: chapterMenus,
+          onSelect: (value) => provider.onSelect(value, context),
+        ),
+      ],
+    );
   }
 
   static double lastTopHeight = 0.0;

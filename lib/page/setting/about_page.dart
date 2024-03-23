@@ -1,8 +1,15 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:about/about.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:text_composition/text_composition.dart';
 import 'package:wos/main.dart';
 
 import '../../global.dart';
+import '../../utils.dart';
+import '../../utils/cache_util.dart';
 import '../../wos_theme.dart';
 import '../add_local_item_page.dart';
 import 'display_high_rate.dart';
@@ -181,4 +188,66 @@ class AboutPage2 extends StatelessWidget {
                 },
               ),
           ]);
+}
+
+Widget myConfigSettingBuilder(
+    BuildContext context, TextCompositionConfig config) {
+  return configSettingBuilder(
+    context,
+    config,
+    (Color color, void Function(Color color) onChange) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('选择颜色'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: color,
+              onColorChanged: onChange,
+              labelTypes: [],
+              pickerAreaHeightPercent: 0.8,
+              portraitOnly: true,
+              hexInputBar: true,
+            ),
+          ),
+        ),
+      );
+    },
+    (String s, void Function(String s) onChange) async {
+      print("选择背景");
+      final _cacheUtil = CacheUtil(backup: true, basePath: "background");
+      final dir = await _cacheUtil.cacheDir();
+      String path = await Utils.pickFile(
+          context, ['.jpg', '.png', '.webp'], dir,
+          title: "选择背景");
+      if (path == null) {
+        Utils.toast("未选择文件");
+        // onChange('');
+      } else {
+        final file = File(path);
+        final name = Utils.getFileNameAndExt(path);
+        await _cacheUtil.putFile(name, file);
+        Utils.toast('图片 $name 已保存到 $dir');
+        onChange(dir + name);
+      }
+    },
+    (String s, void Function(String s) onChange) async {
+      print("选择字体");
+      final _cacheUtil = CacheUtil(backup: true, basePath: "font");
+      final dir = await _cacheUtil.cacheDir();
+      final ttf = await Utils.pickFile(context, ['.ttf', '.ttc', '.otf'], dir,
+          title: "选择字体");
+      if (ttf == null) {
+        Utils.toast('未选取字体文件');
+        // onChange('');
+        return;
+      }
+      final file = File(ttf);
+      final name = Utils.getFileNameAndExt(ttf);
+      await _cacheUtil.putFile(name, file);
+      await loadFontFromList(file.readAsBytesSync(), fontFamily: name);
+      Utils.toast('字体 $name 已保存到 $dir');
+      onChange(name);
+    },
+  );
 }

@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wos/database/search_item_manager.dart';
 import '../api/api.dart';
 import '../database/search_item.dart';
+import '../global.dart';
 import '../ui/widget/image_place_holder.dart';
 import '../wos_theme.dart';
 import 'chapter_page.dart';
@@ -14,32 +16,36 @@ class FavoriteListPage extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    List<SearchItem> list = SearchItemManager.searchItem;
+    // final sBox = Hive.box(Global.searchItemKey);
     final _size = MediaQuery.of(context).size;
-    return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 6),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.7,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-      ),
-
-      itemCount: list.length,
-      // 遍历
-      itemBuilder: (context, index) {
-        final searchItem = list[index];
-        final longPress = _size.width > 600 || WOSTheme().switchLongPress;
-        VoidCallback openChapter = () => invokeTap(ChapterPage(
-              searchItem: searchItem,
-              key: Key(searchItem.id.toString()),
-            ));
-        VoidCallback openContent = () => print('打开内容');
-        return InkWell(
-            onTap: longPress ? openChapter : openContent,
-            child: _ui_favorite_item(searchItem));
-      },
-    );
+    return ValueListenableBuilder<Box<SearchItem>>(
+        valueListenable: SearchItemManager.sbox.listenable(),
+        builder: (BuildContext context, Box<SearchItem> _, Widget child) {
+          List<SearchItem> list = SearchItemManager.searchItem;
+          return GridView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 6),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.7,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
+              itemCount: list.length,
+              // 遍历
+              itemBuilder: (context, index) {
+                final searchItem = list[index];
+                final longPress =
+                    _size.width > 600 || WOSTheme().switchLongPress;
+                VoidCallback openChapter = () => invokeTap(ChapterPage(
+                      searchItem: searchItem,
+                      key: Key(searchItem.id.toString()),
+                    ));
+                VoidCallback openContent = () => print('打开内容');
+                return InkWell(
+                    onTap: longPress ? openChapter : openContent,
+                    child: _ui_favorite_item(searchItem));
+              });
+        });
   }
 
   Widget _ui_favorite_item(SearchItem searchItem) {

@@ -96,7 +96,12 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
   void parseEpubChapter(List<ChapterItem> c, List<EpubChapter> chapters) {
     for (var chapter in chapters) {
       //获取每章的内容
-      var temp = chapter.HtmlContent;
+      var temp = Utils.getHtmlString(chapter.HtmlContent);
+      // var temp = chapter.HtmlContent;
+
+      while (temp.trimLeft().startsWith(chapter.Title)) {
+        temp = temp.trimLeft().substring(chapter.Title.length);
+      }
       contents.add(temp.trimLeft());
       c.add(ChapterItem(name: chapter.Title, url: "${contents.length}.txt"));
       if (chapter.SubChapters.isNotEmpty) {
@@ -144,7 +149,7 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
                     if (!d.existsSync()) {
                       d.createSync(recursive: true);
                     }
-                    print("写入文件中 $dir");
+                    Utils.toast("写入文件中 $dir");
                     final reg = RegExp(r"^\s*|(\s{2,}|\n)\s*");
                     for (var i = 0; i < contents.length; i++) {
                       File(path.join(dir, '$i.txt')).writeAsStringSync(
@@ -155,7 +160,7 @@ class _AddLocalItemPageState extends State<AddLocalItemPage> {
                     }
                     //写入div中
                     SearchItemManager.addSearchItem(searchItem);
-                    print("成功");
+                    Utils.toast("成功");
                   },
                   child: Text("导入"),
                 ),
