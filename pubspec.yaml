@@ -9,6 +9,7 @@ environment:
 
 dependencies:
     about: ^2.0.0
+    audio_service: ^0.18.12
     flutter:
         sdk: flutter
     cupertino_icons: ^1.0.2
@@ -24,6 +25,9 @@ dependencies:
     intl: ^0.17.0
     oktoast: ^3.0.0
     outline_material_icons: ^0.1.1
+    just_audio: ^0.9.35
+    # just_audio_windows: ^0.2.0
+    # just_audio_mpv: ^0.1.7
     path_provider: ^2.0.1
     permission_handler: ^7.0.0
     provider: ^5.0.0
